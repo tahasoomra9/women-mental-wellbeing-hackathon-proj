@@ -5,6 +5,7 @@ import { detectCrisis } from "@/lib/safety";
 
 type Body = {
   mode?: unknown;
+  style?: unknown;
   messages?: { role?: unknown; text?: unknown }[];
   context?: unknown;
 };
@@ -18,6 +19,7 @@ export async function POST(request: Request) {
   }
 
   const mode = body.mode === "baby" ? "baby" : "therapist";
+  const style = body.style === "listen" ? "listen" : "guide";
   // Only "user" and "model" roles are accepted, so clients can never inject a system message.
   const messages = (Array.isArray(body.messages) ? body.messages : [])
     .filter((m) => m && (m.role === "user" || m.role === "model"))
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
   }
 
   const ctx = cleanContext(body.context);
-  const system = mode === "baby" ? babyPrompt(ctx) : therapistPrompt(ctx);
+  const system = mode === "baby" ? babyPrompt(ctx) : therapistPrompt(ctx, style);
 
   // Baby answers are longer (tips + red flags); reasoning tokens also count toward this cap.
   const maxTokens = mode === "baby" ? 1200 : 600;

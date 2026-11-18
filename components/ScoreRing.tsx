@@ -3,8 +3,8 @@ import type { Wellbeing } from "@/lib/score";
 const TONE_COLOR: Record<Wellbeing["tone"], string> = {
   good: "var(--sage)",
   ok: "var(--sage)",
-  low: "var(--amber)",
-  alert: "var(--alert)",
+  low: "var(--peach-glow)",
+  alert: "var(--primary)", // never red: this is a care signal, not an alarm
   none: "var(--line)",
 };
 
@@ -31,7 +31,7 @@ export default function ScoreRing({ w, size = 168 }: { w: Wellbeing; size?: numb
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-display text-5xl font-semibold">{w.score ?? "–"}</span>
+        <span className="font-display text-5xl font-medium">{w.score ?? "–"}</span>
         <span className="text-sm font-bold" style={{ color: TONE_COLOR[w.tone] === "var(--line)" ? "var(--muted)" : TONE_COLOR[w.tone] }}>
           {w.label}
         </span>
@@ -52,8 +52,8 @@ export function Sparkline({ values }: { values: (number | null)[] }) {
   const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-12 w-full" role="img" aria-label="Wellbeing score over the last 7 days">
-      <path d={d} fill="none" stroke="var(--rose)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
-      <circle cx={last[0]} cy={last[1]} r={4} fill="var(--rose)" />
+      <path d={d} fill="none" stroke="var(--peach-glow)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx={last[0]} cy={last[1]} r={4} fill="var(--peach-glow)" />
     </svg>
   );
 }

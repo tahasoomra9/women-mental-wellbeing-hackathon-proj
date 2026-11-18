@@ -1,6 +1,6 @@
 import "server-only";
 import type { UserContext } from "./prompts";
-import { CRISIS_TOKEN } from "./safety";
+import { COUNTRIES, CRISIS_TOKEN, DEFAULT_COUNTRY } from "./safety";
 
 // Prompt-injection defence that runs before any message reaches the main model.
 // Layer 1 (here): Llama Prompt Guard 2 classifier on Groq + input sanitising.
@@ -63,6 +63,8 @@ export function cleanContext(raw: unknown): UserContext {
         ? { mood, sleep, support, daysAgo: num(ck?.daysAgo, 0, 3650) ?? 0 }
         : undefined,
     babyAgeWeeks: num(c.babyAgeWeeks, 0, 520),
+    // Allow-listed code only, so no free text reaches the prompt.
+    country: COUNTRIES.some((x) => x.code === c.country) ? (c.country as string) : DEFAULT_COUNTRY,
   };
 }
 

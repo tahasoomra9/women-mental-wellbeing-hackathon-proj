@@ -29,13 +29,14 @@ export default function ScreenPage() {
 
   if (result) {
     const band = epdsBand(result.total);
-    const color = band.key === "likely" ? "text-alert" : band.key === "possible" ? "text-amber" : "text-sage";
+    // Never red here: this is information and an invitation to get support, not an alarm.
+    const color = band.key === "likely" ? "text-primary" : band.key === "possible" ? "text-amber" : "text-sage";
     return (
       <section className="space-y-4">
-        <h1 className="font-display text-3xl font-semibold">Your results</h1>
+        <h1 className="font-display text-3xl">Thank you for sharing</h1>
         <div className="rounded-3xl bg-card p-6 text-center shadow-sm">
           <p className="text-sm font-semibold text-muted">EPDS score</p>
-          <p className={`font-display text-6xl font-semibold ${color}`}>
+          <p className={`font-display text-6xl font-medium ${color}`}>
             {result.total}
             <span className="text-2xl text-muted">/{EPDS_MAX}</span>
           </p>
@@ -56,11 +57,11 @@ export default function ScreenPage() {
           This is a screening tool, not a diagnosis. Only a health professional can diagnose postnatal depression.
         </p>
         <div className="flex gap-3">
-          <Link href="/talk" className="flex-1 rounded-full bg-rose py-3 text-center font-bold text-rose-ink">
+          <Link href="/talk" className="flex-1 rounded-full bg-primary py-3 text-center font-bold text-primary-ink">
             Talk to Bloom
           </Link>
-          <Link href="/" className="flex-1 rounded-full border border-line bg-card py-3 text-center font-bold">
-            See my score
+          <Link href="/journey" className="flex-1 rounded-full border border-line bg-card py-3 text-center font-bold">
+            My journey
           </Link>
         </div>
       </section>
@@ -70,7 +71,7 @@ export default function ScreenPage() {
   if (step === -1) {
     return (
       <section className="space-y-4">
-        <h1 className="font-display text-3xl font-semibold">How have you been feeling?</h1>
+        <h1 className="font-display text-3xl">How have you been feeling?</h1>
         <div className="space-y-3 rounded-3xl bg-card p-6 text-sm leading-relaxed shadow-sm">
           <p>
             These 10 questions are the <b>Edinburgh Postnatal Depression Scale (EPDS)</b>, the screening used by
@@ -82,7 +83,7 @@ export default function ScreenPage() {
           </p>
           <p className="text-xs text-muted">Cox, J.L., Holden, J.M., & Sagovsky, R. (1987). British Journal of Psychiatry, 150.</p>
         </div>
-        <button onClick={() => setStep(0)} className="w-full rounded-full bg-rose py-3 font-bold text-rose-ink">
+        <button onClick={() => setStep(0)} className="w-full rounded-full bg-brand py-3 font-bold text-primary-ink">
           Start
         </button>
       </section>
@@ -102,18 +103,18 @@ export default function ScreenPage() {
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-line">
-          <div className="h-full rounded-full bg-rose transition-all" style={{ width: `${((step + 1) / EPDS_ITEMS.length) * 100}%` }} />
+          <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${((step + 1) / EPDS_ITEMS.length) * 100}%` }} />
         </div>
       </div>
       <p className="text-sm font-semibold text-muted">In the past 7 days…</p>
-      <h2 className="font-display text-2xl font-semibold leading-snug">{item.q}</h2>
+      <h2 className="font-display text-2xl leading-snug">{item.q}</h2>
       <div className="space-y-2">
         {item.options.map((o) => (
           <button
             key={o.label}
             onClick={() => answer(o.score)}
-            className={`w-full rounded-2xl border bg-card px-4 py-3.5 text-left transition hover:border-rose ${
-              answers[step] === o.score ? "border-rose" : "border-line"
+            className={`w-full rounded-2xl border bg-card px-4 py-3.5 text-left transition hover:border-primary ${
+              answers[step] === o.score ? "border-primary" : "border-line"
             }`}
           >
             {o.label}

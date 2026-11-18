@@ -47,5 +47,6 @@ export function buildContext(epds: EpdsResult[], checkins: Checkin[], profile: P
       ? { mood: c.mood, sleep: c.sleep, support: c.support, daysAgo: Math.floor((now - c.ts) / DAY) }
       : undefined,
     babyAgeWeeks: babyAgeWeeks(profile, now),
+    country: profile.country,
   };
 }

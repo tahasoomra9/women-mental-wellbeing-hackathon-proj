@@ -7,8 +7,12 @@ export type ChatMessage = { role: "user" | "model"; text: string; ts: number };
 export type Checkin = { ts: number; mood: number; sleep: number; support: number; note?: string };
 export type BabyEvent = { ts: number; kind: "feed" | "sleep" | "diaper" };
 export type Insight = { ts: number; moodScore: number; themes: string[]; suggestion: string };
-export type Profile = { name?: string; babyBirth?: string; acceptedDisclaimer?: boolean };
+export type Profile = { name?: string; babyBirth?: string; acceptedDisclaimer?: boolean; country?: string };
 export type CrisisState = { active: boolean; ts: number };
+/** A message started elsewhere (e.g. Home) for a chat to send when it opens. */
+export type Pending = { mode: "therapist" | "baby"; text: string } | null;
+/** "listen" = reflect and validate only; "guide" = gentle suggestions / CBT. */
+export type TalkStyle = "listen" | "guide";
 
 export type Store = {
   "chat:therapist": ChatMessage[];
@@ -19,6 +23,8 @@ export type Store = {
   insights: Insight[];
   profile: Profile;
   crisis: CrisisState;
+  pending: Pending;
+  talkStyle: TalkStyle;
 };
 
 const PREFIX = "bloom:";

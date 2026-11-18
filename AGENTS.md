@@ -28,11 +28,17 @@ npm run lint
 ## Map
 | Path | What it does |
 |---|---|
-| `app/page.tsx` | Dashboard: score ring, trend, insight card, nav cards, demo seed/reset |
+| `app/page.tsx` | Home, built around talking: daily affirmation, "How are you, really?" message box and feeling chips (these hand off to Talk through the `pending` store key), breathing card, gentle care nudge, a Journey teaser with **no number** |
+| `app/journey/page.tsx` | Score ring, trend, "What's shaping this", insights, check-in and EPDS links, Settings (country, demo data, reset) |
 | `app/talk/page.tsx` | Therapist chat (wraps `ChatWindow mode="therapist"`) |
 | `app/screen/page.tsx` | EPDS 10-question flow and result |
-| `app/checkin/page.tsx` | Daily mood / sleep / support check-in |
+| `app/checkin/page.tsx` | Daily mood (drawn faces, not emoji) / sleep / support check-in |
+| `components/Icon.tsx` | Inline SVG icon set. Use it instead of emoji for icons |
+| `components/BloomAvatar.tsx` | Bloom's breathing gradient orb (its "presence") |
 | `app/baby/page.tsx` | Feed/sleep/diaper quick log and baby-care chat |
+| `app/breathe/page.tsx` | 1-minute paced breathing (in 4 / hold 2 / out 6, 5 rounds). Bloom links to it as `[Take a minute to breathe](/breathe)` |
+| `components/ScoreExplainer.tsx` | "Why this score?" panel under the ring (uses `explainWellbeing`) |
+| `components/CountrySelect.tsx` | Country dropdown used in onboarding, the crisis banner and the home footer |
 | `app/api/chat/route.ts` | POST, streams plain text from Groq. Sets `X-Crisis: 1` on risky input |
 | `app/api/insight/route.ts` | POST, structured JSON `{moodScore, themes, suggestion}` |
 | `components/ChatWindow.tsx` | Shared chat UI: streaming, crisis handling, auto-insight |
@@ -43,7 +49,7 @@ npm run lint
 | `lib/epds.ts` | EPDS items, scoring, risk bands |
 | `lib/score.ts` | Wellbeing formula and 7-day history |
 | `lib/prompts.ts` | All system prompts (therapist, baby, insight) |
-| `lib/safety.ts` | Crisis regex, `CRISIS_TOKEN`, `HOTLINES` |
+| `lib/safety.ts` | Crisis regex (English only), `CRISIS_TOKEN`, per-country `COUNTRIES` hotlines, `DEFAULT_COUNTRY = "GB"`, `getHotlines()` |
 | `lib/llm.ts` | Server-only Groq client: `complete()` (supports `jsonSchema`) and `streamCompletion()`. Falls back to `gpt-oss-20b` on 429/5xx. Throws `LlmError`, whose `publicMessage` is the only error text sent to the browser |
 | `lib/guard.ts` | Prompt-injection classifier (`isInjection`, Llama Prompt Guard 2), `cleanText`, `cleanContext`, canned `GUARD_REPLY` |
 | `lib/client.ts` | `useNow`, `stamp`, `timeAgo`, `buildContext` |
@@ -57,8 +63,12 @@ npm run lint
 - Prompts must never diagnose, never advise on medication, and never claim to be human or a licensed therapist. User-facing copy calls Bloom an "AI companion".
 - Keep the EPDS wording and scores exactly as in `lib/epds.ts`, because it is a validated instrument. Reverse-scored items are 3 and 5–10.
 
+### Hotlines and language
+- Hotline numbers are safety-critical. Only add numbers you've verified from an official source, and note the hours if the line isn't 24/7. Every country list ends with findahelpline.com.
+- Bloom replies in her language and script (`LANGUAGE_RULES`, plus a final reminder at the end of each chat prompt, which the model needs). The `[[CRISIS]]` token always stays in English. The crisis regex is English-only, so for other languages the model's token is the only crisis signal.
+
 ### Scope and prompt injection (do not weaken)
-- **Topic limits:** the Talk chat discusses only *her* wellbeing. The Baby chat discusses only *her baby*. Anything else gets a one-line kind redirect (rules in `lib/prompts.ts`).
+- **Topic limits:** the Talk chat covers *her* wellbeing and her everyday life as a mum, including practical help (productivity, routines, chores, asking for help, food for herself). The Baby chat discusses only *her baby*. Anything else gets a one-line kind redirect (rules in `lib/prompts.ts`).
 - **Baby chat, "who is this about?":** an ambiguous subject ("my man", a bare "he", adult-sounding symptoms) gets one clarifying question and no advice yet. Never give health advice for a partner or another adult there.
 - **Layer 1, code (`lib/guard.ts` and the chat route):**
   - only `user`/`model` roles are accepted from the client
@@ -77,12 +87,15 @@ npm run lint
 - New persisted data: add the key and its type to `Store` in `lib/storage.ts`, then use `useStore(key, fallback)`. Do not call `localStorage` directly.
 
 ### Style
-- Mobile-first, `max-w-md`. Use the colour tokens from `app/globals.css` (`bg-card`, `text-muted`, `bg-rose`, `text-alert`, …), not raw hex. Dark mode depends on those tokens.
-- Headings use `font-display` (Fraunces). Body text is Nunito.
+- Mobile-first, `max-w-md`. Use the colour tokens from `app/globals.css` (`bg-card`, `text-muted`, `bg-primary`, `bg-peach-soft`, `text-sage`, …), not raw hex. Dark mode depends on those tokens.
+- **Red (`alert`) is only for crisis and safety UI.** Scores, EPDS results and care nudges use primary (lavender), peach or amber, never red.
+- Home must never show the score number. The score lives on Journey. Home celebrates effort ("checked in 3 days this week").
+- Headings use `font-display` (Lora). Body text is Nunito. Use SVG icons from `components/Icon.tsx`, not emoji. Touch targets are at least 40–44px.
+- Talk has a "Just listen" / "Help me through it" switch (`talkStyle`, default "listen"). In listen mode the prompt forbids advice unless she asks a direct question. See `LISTEN_REMINDER` in `lib/prompts.ts`.
 - Keep copy warm, short and non-judgmental, and use "you".
 
 ## Verifying a change
 1. `npx tsc --noEmit && npm run lint && npm run build`.
-2. `npm run dev`. On the home page, click **Load demo data** and check that the score shows about 46, "Needs support".
+2. `npm run dev`. Open **Journey → Settings → Load demo data** and check that the score shows about 46, "Needs extra care".
 3. Talk: a starter chip streams a reply. Typing "I want to kill myself" shows the banner even when the API fails.
 4. EPDS: all-best answers give 0, all-worst give 30, and any answer above 0 on item 10 shows hotlines.

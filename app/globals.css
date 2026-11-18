@@ -1,38 +1,56 @@
 @import "tailwindcss";
 
+/*
+  Bloom palette: calm lavender + warm peach, sage for "good things".
+  Red (--alert) is reserved for crisis/safety UI only. Never use it for scores or nudges.
+*/
 :root {
-  --bg: #fbf6f1;
+  --bg: #fbf8f6;
   --card: #ffffff;
-  --ink: #3a2e2b;
-  --muted: #8a7a74;
-  --line: #efe4dc;
-  --rose: #d9787f;
-  --rose-ink: #ffffff;
-  --rose-soft: #fbe5e3;
-  --sage: #7fa38b;
-  --sage-soft: #e3efe6;
-  --amber: #e0a458;
-  --amber-soft: #fbefdc;
-  --alert: #c4474f;
-  --alert-soft: #fde4e4;
+  --ink: #3b3350;
+  --muted: #625a77;
+  --line: #ebe5f1;
+  --primary: #6450b0;
+  --primary-2: #9a5fa8; /* warm mauve: second stop of the brand gradient */
+  --primary-ink: #ffffff;
+  --primary-soft: #efebfa;
+  --peach: #c8573a;
+  --peach-glow: #f0a88c; /* decorative only (orb, ring, sparkline) */
+  --peach-soft: #fdeee7;
+  --sage: #3b6e52;
+  --sage-soft: #e5efe9;
+  --sage-ink: #ffffff;
+  --amber: #8a5712;
+  --amber-soft: #fbf0df;
+  --alert: #b23c46;
+  --alert-soft: #fbe7e8;
+  --wash-1: #fde9df;
+  --wash-2: #ece6fb;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1d1918;
-    --card: #282220;
-    --ink: #f3e9e4;
-    --muted: #b3a29b;
-    --line: #3a312e;
-    --rose: #e58e94;
-    --rose-ink: #2a1a1b;
-    --rose-soft: #3d2a2b;
-    --sage: #9cc2a8;
-    --sage-soft: #26332b;
-    --amber: #ebb877;
+    --bg: #16131d;
+    --card: #211d2b;
+    --ink: #ede8f5;
+    --muted: #aca3bd;
+    --line: #322c3f;
+    --primary: #b3a6f0;
+    --primary-2: #d9a0e0;
+    --primary-ink: #1b1530;
+    --primary-soft: #2b2540;
+    --peach: #f0b098;
+    --peach-glow: #f0b098;
+    --peach-soft: #36272a;
+    --sage: #93c2a6;
+    --sage-soft: #1e2c25;
+    --sage-ink: #12201a;
+    --amber: #e9b97a;
     --amber-soft: #3a3022;
-    --alert: #f07a80;
-    --alert-soft: #42262a;
+    --alert: #f08a90;
+    --alert-soft: #43262b;
+    --wash-1: #2a1f27;
+    --wash-2: #211c33;
   }
 }
 
@@ -42,25 +60,96 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
-  --color-rose: var(--rose);
-  --color-rose-ink: var(--rose-ink);
-  --color-rose-soft: var(--rose-soft);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-peach-glow: var(--peach-glow);
+  --color-peach: var(--peach);
+  --color-peach-soft: var(--peach-soft);
   --color-sage: var(--sage);
   --color-sage-soft: var(--sage-soft);
+  --color-sage-ink: var(--sage-ink);
   --color-amber: var(--amber);
   --color-amber-soft: var(--amber-soft);
   --color-alert: var(--alert);
   --color-alert-soft: var(--alert-soft);
   --font-sans: var(--font-nunito);
-  --font-display: var(--font-fraunces);
+  --font-display: var(--font-lora);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Brand gradient for primary actions and your own message bubbles. */
+.bg-brand {
+  background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 140%);
+}
+.bg-brand:disabled {
+  background-image: none;
+  background-color: var(--primary);
 }
 
 body {
-  background: var(--bg);
+  background-color: var(--bg);
+  /* Soft dawn wash at the top of every screen: warm, not clinical. */
+  background-image:
+    radial-gradient(120% 60% at 0% 0%, var(--wash-1) 0%, transparent 60%),
+    radial-gradient(120% 60% at 100% 0%, var(--wash-2) 0%, transparent 55%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-nunito), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 12px;
 }
 
 input[type="range"] {
-  accent-color: var(--rose);
+  accent-color: var(--primary);
+}
+
+/* Bloom's gentle "presence" pulse */
+@keyframes bloom-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+.animate-bloom {
+  animation: bloom-breathe 5s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bloom,
+  .animate-fade-up {
+    animation: none;
+  }
 }

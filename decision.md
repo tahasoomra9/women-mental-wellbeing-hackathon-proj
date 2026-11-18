@@ -38,7 +38,7 @@ Each entry records the decision, why we made it, and what would make us revisit 
 ### D7. Safety: three layers of crisis detection
 **Decision:** (1) a client regex on send, (2) a server regex that sets the `X-Crisis` header, and (3) the model starting its reply with `[[CRISIS]]`. Any of these shows a sticky hotline banner. It stays until the user taps "I'm safe right now".
 **Why:** Regex is instant and works even when the AI is down. The model catches indirect phrasing that regex misses. In mental health a false positive costs little and a false negative costs a lot.
-**Hotlines:** These are configurable in `lib/safety.ts`. The defaults are US-centric (988, Postpartum Support International) plus findahelpline.com. Localise them before demoing elsewhere.
+**Hotlines:** These are per country. See D17.
 
 ### D8. Framing: "AI companion", not "therapist"
 **Decision:** The product uses therapeutic techniques (CBT, validation, behavioural activation) but calls itself an AI companion. A first-launch disclaimer and a footer say so.
@@ -60,9 +60,14 @@ Each entry records the decision, why we made it, and what would make us revisit 
 **Decision:** "Load demo data" on the home page writes a 6-day history of a struggling mother (EPDS 9 → 14).
 **Why:** A judge sees a full dashboard in one click. A full flow can still be shown live.
 
-### D13. Strict topic limits per chat
-**Decision:** Talk covers only her wellbeing. Baby covers only infant care. Off-topic requests (code, homework, role-play, romance, adult medical advice) get one kind sentence and a redirect, and are never partly answered. Postpartum physical red flags (heavy bleeding, chest pain, severe headache…) always get an "urgent care now" reply.
-**Why:** The app is a health product. Off-topic answers waste the tokens-per-minute quota, create liability, and make demos look unfocused.
+### D13. Topic limits per chat (widened to everyday life)
+**Decision:**
+- **Talk** covers her wellbeing *and* her everyday life as a mum. That includes practical help with planning her day, productivity, routines around naps, chores and the mental load, asking for help, quick food ideas for herself, self-care, and going back to work. When unsure, Bloom leans towards helping.
+- **Baby** covers only infant care.
+- Truly off-topic requests (code, homework, essays, politics, role-play, romance, medical advice for other adults) get one kind sentence and a redirect, and are never partly answered.
+- Postpartum physical red flags always get an "urgent care now" reply.
+- Practical answers are realistic for someone on broken sleep (rest counts as productive). If she's struggling (EPDS ≥ 13, mood ≤ 2, sleep under 5h, or unsupported), Bloom names it, gives 2–3 items at most, and says it's okay to do less.
+**Why:** The first version refused "how can I make my day more productive". That's exactly the kind of pressure the app exists to help with, so practical help with a gentle reframe *is* mental-health support. We still refuse truly off-topic requests, because they waste the tokens-per-minute quota and make the app feel unfocused.
 
 ### D14. Baby chat asks "who is this about?" first
 **Decision:** Before answering, the baby chat decides whether the subject is (a) the baby, (b) ambiguous, (c) someone else, or (d) not about childcare. For ambiguous cases ("my man poops all day", "he hasn't slept in 2 days") it asks one clarifying question, gives no advice, and never assumes the partner. After she clarifies, it answers her original question without making her repeat it.
@@ -82,10 +87,41 @@ Each entry records the decision, why we made it, and what would make us revisit 
 **Decision:** `max_completion_tokens` drops to 700. On a 429 or 5xx, retry once on `openai/gpt-oss-20b`, which has its own per-model limit. Users only ever see `LlmError.publicMessage`.
 **Why:** The free tier allows 8,000 tokens per minute, and Groq counts the reserved completion budget against it. A few quick messages hit it in testing. Raw Groq errors also exposed the org ID.
 
+### D17. Hotlines by country, UK by default
+**Decision:**
+- She picks her country during onboarding. The default is the **UK**. She can change it from the home page or from inside the crisis banner.
+- Lists: UK, US, Ireland, Canada, Australia, India and Pakistan, plus "Other", which shows the local emergency number and findahelpline.com.
+- Pakistan shows only Rescue 1122, because sources disagreed on mental-health helpline numbers.
+- The country is also passed to the AI as an allow-listed code, so Bloom uses local terms (GP, health visitor, NHS 111).
+**Why:** Showing a UK mother US numbers in a crisis is a real failure. We only include numbers we have verified.
+
+### D18. Bloom replies in her language
+**Decision:** Bloom replies in her language and script, including Roman Urdu/Hinglish. A final reminder sits at the end of each chat prompt, because without it crisis replies fell back to English. The insight summary is also written in her language.
+**Why:** Many mothers who most need support aren't comfortable in English. **Known gap:** the client and server crisis regex is English-only. For other languages we rely on the model's `[[CRISIS]]` token, which worked in testing with Spanish.
+
+### D19. "I need a minute" breathing exercise
+**Decision:** `/breathe` offers a 1-minute paced breathing exercise (in 4, hold 2, out 6). It has a button on the home page, and Bloom can offer it once per conversation as an in-app link. Afterwards she chooses "A bit calmer" or "Still tense, let's talk".
+**Why:** It gives immediate, practical relief with no AI call and no network dependency. It's also a calm, visual moment in the demo.
+
+### D20. Explaining the score
+**Decision:** Tapping the score ring shows each factor's pull relative to a baseline of 70, using the same weights as the score. Factors are listed biggest drag first, with a tip or link for each negative one, plus the change since yesterday and notes for missing data and the EPDS override.
+**Why:** A score without an explanation feels like a judgment. Showing "sleep 3.5h pulled you down" makes it actionable and builds trust.
+
+### D21. Redesign: somewhere to talk, not a scorecard
+**Problem:** The home page opened on a score ring with a red "needs support" box, so the app felt like a report card on her life rather than a safe place to vent.
+**Decision:**
+- **Home is built around talking:** a daily affirmation, a big "How are you, really?" message box, and one-tap feelings ("Overwhelmed", "Lonely"…). These open Talk with the message already sent, using the `pending` store key. Also: the breathing card, a lavender "You deserve care too" nudge when struggling, and a Journey teaser that celebrates check-ins and **never shows a number**.
+- **The score moved to an optional Journey tab.** It's framed as "Not a grade" and uses gentler labels: Blooming, Steady, Tender days, Needs extra care.
+- **Talk is built for venting:** a "Just listen" / "Help me through it" switch, with "Just listen" as the default. In listen mode Bloom only reflects and validates, unless she asks a direct question or safety applies. There's also a "Start fresh" button (the conversation is summarised for Journey first), the line "Private. Saved only on this phone", and Bloom's breathing orb as a sense of presence.
+- **Visual system:** calm lavender with warm peach and sage, Lora and Nunito fonts, and a soft "dawn" gradient behind every screen. Red is reserved for crisis UI. SVG icons replace emoji, and drawn faces replace the mood emoji. Bottom nav: Home · Talk · Baby · Journey.
+- Local wording: "Nappy" instead of "Diaper" for UK/IE/AU/IN/PK.
+**Colour pass:** Light-mode contrast was measured, and peach icons (2.0:1), amber text (3.2:1) and sage labels (3.9:1) were too faint. Deeper tones now give 3.8–6.3:1, and every text pair is at least 4.5:1 in both themes. Decorative uses (Bloom's orb, the score ring and sparkline) keep the softer `--peach-glow`. Primary buttons, the active switch and your own message bubbles use a lavender-to-mauve gradient (`.bg-brand`). Check new colour pairs for contrast before adding them.
+**Why:** Mothers with PPD already feel judged. The first screen should invite her to talk, and tracking should feel like noticing patterns, not grading. A clear "just listen" mode respects that venting often doesn't need fixing.
+**Verified:** headless Edge screenshots at 390×844 in light and dark mode, plus a live test of the Home → Talk flow and of both talk styles.
+
 ---
 
 ## Open questions
-- Localise hotlines for the judging region?
 - Partner/support-person view (sharing the score with consent)?
 - Encrypt localStorage, or move to accounts after the hackathon (D3)?
 - Clinician validation of the score weights (D6).
