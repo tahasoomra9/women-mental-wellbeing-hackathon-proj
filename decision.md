@@ -125,6 +125,15 @@ Each entry records the decision, why we made it, and what would make us revisit 
 **Not converted on purpose:** The chat composers, which are custom pill-shaped auto-growing inputs.
 **Cost:** More CSS and JS in the bundle. The country picker in the crisis banner is now a custom popup; it was tested to open correctly there.
 
+### D23. Layout audit
+**Found and fixed:**
+- Astryx's theme reset every `<p>`, which turned text in your own chat bubbles dark on purple and changed paragraph sizes. It's neutralised in `@layer base`.
+- Screen titles, subtitle gaps and section spacing differed per page, so a shared `PageHeader` and a single `space-y-5` rhythm were introduced.
+- Tap targets under 36px (Journey settings and links, the in-chat breathing link, Undo) were enlarged to at least 40px, and 11px text became 12px.
+- The Baby log card had different padding from Check-in.
+**Verified:** no horizontal overflow at 320 or 390px (also 360 and 430 before the fixes) on any screen, and the screens were checked visually in light mode, plus the crisis banner and a desktop width.
+**Left alone:** Astryx's own inner pieces (the date field's text input and calendar icon, the slider thumb wrapper), whose enclosing controls are full-size. On desktop the app is a centred phone-width column on purpose.
+
 ---
 
 ## Open questions

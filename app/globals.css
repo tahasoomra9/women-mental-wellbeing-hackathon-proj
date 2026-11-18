@@ -86,6 +86,22 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+  Astryx's theme resets every <p> and <small> (colour, size, line-height) in its own low layer.
+  That turned text inside coloured bubbles dark and changed paragraph sizes. Undo it in a layer that
+  sits above Astryx's reset but below Tailwind utilities, so text inherits as before and our classes still win.
+*/
+@layer base {
+  p,
+  small {
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: inherit;
+  }
+}
+
 /* Brand gradient for primary actions and your own message bubbles. */
 .bg-brand {
   background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 140%);

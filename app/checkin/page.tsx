@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Slider } from "@astryxdesign/core/Slider";
 import { TextArea } from "@astryxdesign/core/TextArea";
 import Icon from "@/components/Icon";
+import PageHeader from "@/components/PageHeader";
 import { useState } from "react";
 import { useStore } from "@/lib/storage";
 
@@ -58,10 +59,7 @@ export default function CheckinPage() {
 
   return (
     <section className="space-y-5">
-      <header>
-        <h1 className="font-display text-3xl">A gentle check-in</h1>
-        <p className="text-sm text-muted">30 seconds, just for you. There are no wrong answers.</p>
-      </header>
+      <PageHeader title="A gentle check-in" subtitle="30 seconds, just for you. There are no wrong answers." />
 
       <div className="rounded-3xl bg-card p-5 shadow-sm">
         <p className="font-bold">How is your mood today?</p>
@@ -77,7 +75,7 @@ export default function CheckinPage() {
               }`}
             >
               <Face mood={i + 1} />
-              <span className="text-[11px] font-bold leading-tight">{m}</span>
+              <span className="text-xs font-bold leading-tight">{m}</span>
             </button>
           ))}
         </div>

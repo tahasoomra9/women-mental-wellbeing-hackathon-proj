@@ -31,7 +31,7 @@ export default function ScoreExplainer({ ex, delta }: { ex: Explanation; delta: 
                 </p>
                 {f.tip && f.direction !== "up" && <p className="text-xs text-muted">{f.tip}</p>}
                 {f.action && f.direction === "down" && (
-                  <Link href={f.action.href} className="text-xs font-bold text-primary underline">
+                  <Link href={f.action.href} className="inline-flex min-h-10 items-center text-xs font-bold text-primary underline">
                     {f.action.label}
                   </Link>
                 )}
@@ -44,13 +44,13 @@ export default function ScoreExplainer({ ex, delta }: { ex: Explanation; delta: 
         <p key={n.text} className="mt-3 text-xs text-muted">
           {n.text}{" "}
           {n.action && (
-            <Link href={n.action.href} className="font-bold text-primary underline">
+            <Link href={n.action.href} className="inline-flex min-h-10 items-center font-bold text-primary underline">
               {n.action.label}
             </Link>
           )}
         </p>
       ))}
-      <p className="mt-3 text-[11px] text-muted">
+      <p className="mt-3 text-xs text-muted">
         <span className="font-bold text-amber">↓</span> weighing on you · <span className="font-bold text-sage">↑</span> lifting
         up. Biggest effect first.
       </p>

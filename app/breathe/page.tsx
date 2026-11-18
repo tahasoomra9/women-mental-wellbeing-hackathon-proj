@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Icon from "@/components/Icon";
+import PageHeader from "@/components/PageHeader";
 import { useEffect, useState } from "react";
 
 // 1-minute paced breathing: in 4s, hold 2s, out 6s. A longer out-breath calms the body. 5 rounds.
@@ -39,10 +40,10 @@ export default function BreathePage() {
 
   return (
     <section className="flex flex-1 flex-col items-center text-center">
-      <h1 className="font-display text-3xl">Take a minute</h1>
-      <p className="mt-1 text-sm text-muted">
-        {state.status === "done" ? "Well done. You gave yourself a moment." : "Just follow the circle. Nothing else needs you right now."}
-      </p>
+      <PageHeader
+        title="Take a minute"
+        subtitle={state.status === "done" ? "Well done. You gave yourself a moment." : "Just follow the circle. Nothing else needs you right now."}
+      />
 
       <div className="relative my-10 flex h-64 w-64 items-center justify-center">
         <div

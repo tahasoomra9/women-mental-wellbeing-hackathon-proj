@@ -19,7 +19,7 @@ const components: Components = {
   a: ({ href, children }) =>
     href?.startsWith("/") && !href.startsWith("//") ? (
       // In-app link (e.g. the breathing exercise Bloom suggests): show as a button-like pill.
-      <Link href={href} className="mt-1 inline-block rounded-full bg-sage-soft px-3 py-1 font-bold text-sage no-underline">
+      <Link href={href} className="mt-1 inline-flex min-h-10 items-center rounded-full bg-sage-soft px-4 font-bold text-sage no-underline">
         {children} →
       </Link>
     ) : (

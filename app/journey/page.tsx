@@ -3,6 +3,7 @@
 import Link from "next/link";
 import CountrySelect from "@/components/CountrySelect";
 import Icon from "@/components/Icon";
+import PageHeader from "@/components/PageHeader";
 import ScoreExplainer from "@/components/ScoreExplainer";
 import ScoreRing, { Sparkline } from "@/components/ScoreRing";
 import { timeAgo, useNow } from "@/lib/client";
@@ -32,10 +33,7 @@ export default function JourneyPage() {
 
   return (
     <section className="space-y-5">
-      <header>
-        <h1 className="font-display text-3xl">Your journey</h1>
-        <p className="mt-1 text-sm text-muted">Not a grade. Just a gentle way to notice patterns over time.</p>
-      </header>
+      <PageHeader title="Your journey" subtitle="Not a grade. Just a gentle way to notice patterns over time." />
 
       {w.score === null ? (
         <div className="rounded-3xl bg-card p-6 text-center shadow-sm">
@@ -108,20 +106,20 @@ export default function JourneyPage() {
       </div>
 
       <details className="rounded-3xl bg-card p-5 text-sm shadow-sm">
-        <summary className="cursor-pointer font-bold">Settings</summary>
+        <summary className="flex min-h-11 cursor-pointer items-center font-bold">Settings</summary>
         <div className="mt-4 flex items-center justify-between gap-3">
           Helplines for
           <CountrySelect value={profile.country} onChange={(code) => setProfile((p) => ({ ...p, country: code }))} width={200} />
         </div>
         <div className="mt-4 flex gap-4 text-xs text-muted">
-          <button onClick={() => seedDemo(now)} className="underline">
+          <button onClick={() => seedDemo(now)} className="min-h-11 px-1 underline">
             Load demo data
           </button>
           <button
             onClick={() => {
               if (confirm("Delete all Bloom data on this device?")) clearStore();
             }}
-            className="underline"
+            className="min-h-11 px-1 underline"
           >
             Reset all data
           </button>

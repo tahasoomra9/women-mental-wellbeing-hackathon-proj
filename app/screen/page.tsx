@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PageHeader from "@/components/PageHeader";
 import { useState } from "react";
 import { HotlineList } from "@/components/CrisisBanner";
 import { EPDS_ITEMS, EPDS_MAX, epdsBand, scoreEpds, type EpdsResult } from "@/lib/epds";
@@ -33,7 +34,7 @@ export default function ScreenPage() {
     const color = band.key === "likely" ? "text-primary" : band.key === "possible" ? "text-amber" : "text-sage";
     return (
       <section className="space-y-4">
-        <h1 className="font-display text-3xl">Thank you for sharing</h1>
+        <PageHeader title="Thank you for sharing" />
         <div className="rounded-3xl bg-card p-6 text-center shadow-sm">
           <p className="text-sm font-semibold text-muted">EPDS score</p>
           <p className={`font-display text-6xl font-medium ${color}`}>
@@ -71,7 +72,7 @@ export default function ScreenPage() {
   if (step === -1) {
     return (
       <section className="space-y-4">
-        <h1 className="font-display text-3xl">How have you been feeling?</h1>
+        <PageHeader title="How have you been feeling?" />
         <div className="space-y-3 rounded-3xl bg-card p-6 text-sm leading-relaxed shadow-sm">
           <p>
             These 10 questions are the <b>Edinburgh Postnatal Depression Scale (EPDS)</b>, the screening used by

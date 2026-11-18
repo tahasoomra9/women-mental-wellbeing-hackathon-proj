@@ -87,6 +87,13 @@ npm run lint
 - Full component docs are in `node_modules/@astryxdesign/core/dist/<Component>/*.d.ts` and the package README. `npx @astryxdesign/cli init` has **not** been run, so it hasn't edited this file.
 - The chat composers (Home and chat screens) stay as plain textareas on purpose: they auto-grow and are styled as one pill with the send button.
 
+### Layout consistency
+- Every screen title uses `components/PageHeader.tsx` (`text-3xl`, 1.5-unit gap to the subtitle). Home and Talk have their own hero headers on purpose.
+- Page sections are spaced with `space-y-5` (or `gap-5` for the chat pages that must stretch). Cards: `rounded-3xl bg-card p-5`; link rows `p-4`; hero or empty-state cards `p-6`.
+- Minimum text size is 12px (`text-xs`); never `text-[11px]`. Buttons, links and summaries need at least ~40px height (`min-h-10` or `min-h-11`).
+- Astryx's theme resets every `<p>`/`<small>`; `@layer base` in `app/globals.css` undoes it so text inherits colour and size. If text inside a coloured container looks wrong, check that rule first.
+- To audit layout: serve a production build, load the pages in headless Edge at 320 and 390px, and check for horizontal overflow, small tap targets and text under 12px.
+
 ### Next.js / React
 - The LLM is called only from route handlers, never from client code. `lib/llm.ts` imports `server-only`. Message roles are stored as `user`/`model` in the browser and mapped to `user`/`assistant` in `app/api/chat/route.ts`.
 - Strict JSON schema mode (insight route) requires every property in `required` and `additionalProperties: false`.

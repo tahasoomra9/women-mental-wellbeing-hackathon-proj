@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { ISODateString } from "@astryxdesign/core/Calendar";
 import { DateInput } from "@astryxdesign/core/DateInput";
 import ChatWindow from "@/components/ChatWindow";
+import PageHeader from "@/components/PageHeader";
 import Icon, { type IconName } from "@/components/Icon";
 import { babyAgeWeeks, stamp, timeAgo, useNow } from "@/lib/client";
 import { DEFAULT_COUNTRY } from "@/lib/safety";
@@ -39,15 +40,13 @@ export default function BabyPage() {
   }, [justLogged]);
 
   return (
-    <>
-      <header className="mb-4">
-        <h1 className="font-display text-3xl">Baby care</h1>
-        <p className="text-sm text-muted">
-          {weeks !== undefined ? `Your little one is ${weeks} weeks old. ` : ""}One less thing to keep in your head.
-        </p>
-      </header>
+    <section className="flex flex-1 flex-col gap-5">
+      <PageHeader
+        title="Baby care"
+        subtitle={`${weeks !== undefined ? `Your little one is ${weeks} weeks old. ` : ""}One less thing to keep in your head.`}
+      />
 
-      <div className="mb-5 rounded-3xl bg-card p-4 shadow-sm">
+      <div className="rounded-3xl bg-card p-5 shadow-sm">
         <p className="mb-3 text-xs font-bold text-muted">Tap to log</p>
         <div className="grid grid-cols-3 gap-2">
           {KINDS.map((k) => {
@@ -70,7 +69,7 @@ export default function BabyPage() {
                 </span>
                 <span className="mt-1.5 block text-sm font-bold">{logged ? "Logged" : label}</span>
                 <span className="block text-xs text-muted">{last && now ? timeAgo(last.ts, now) : "–"}</span>
-                <span className="block text-[11px] text-muted">{today} today</span>
+                <span className="block text-xs text-muted">{today} today</span>
               </button>
             );
           })}
@@ -88,7 +87,7 @@ export default function BabyPage() {
             />
           </div>
           {log.length > 0 && (
-            <button onClick={() => setLog((prev) => prev.slice(0, -1))} className="min-h-9 px-2 font-semibold underline">
+            <button onClick={() => setLog((prev) => prev.slice(0, -1))} className="min-h-11 px-3 font-semibold underline">
               Undo last
             </button>
           )}
@@ -96,6 +95,6 @@ export default function BabyPage() {
       </div>
 
       <ChatWindow mode="baby" placeholder="Ask about feeding, sleep, crying…" />
-    </>
+    </section>
   );
 }

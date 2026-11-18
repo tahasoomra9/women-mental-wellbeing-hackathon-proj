@@ -287,7 +287,7 @@ export default function ChatWindow({ mode, placeholder }: { mode: Mode; placehol
           <Icon name="send" className="h-5 w-5" strokeWidth={2.25} />
         </button>
       </form>
-      <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted">
+      <p className="mt-2 flex items-center justify-center gap-1 text-xs text-muted">
         <Icon name="lock" className="h-3 w-3" /> Private. Your chats are saved only on this phone.
       </p>
       </div>
