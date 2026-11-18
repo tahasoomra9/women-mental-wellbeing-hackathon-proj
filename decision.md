@@ -119,6 +119,12 @@ Each entry records the decision, why we made it, and what would make us revisit 
 **Why:** Mothers with PPD already feel judged. The first screen should invite her to talk, and tracking should feel like noticing patterns, not grading. A clear "just listen" mode respects that venting often doesn't need fixing.
 **Verified:** headless Edge screenshots at 390×844 in light and dark mode, plus a live test of the Home → Talk flow and of both talk styles.
 
+### D22. Astryx for form controls
+**Decision:** Native sliders, date input, country dropdown and the check-in note are replaced with Astryx components (`Slider`, `DateInput`, `Selector`, `TextArea`) from `@astryxdesign/core`, using its pre-built CSS with no compiler plugin. Astryx's tokens are mapped onto Bloom's palette, so it follows our light and dark themes. `@stylexjs/stylex` is installed because Astryx lists it as a dependency, but we don't write StyleX ourselves.
+**Why:** Native controls look different on every device and ignore our palette. Astryx gives accessible keyboard and touch behaviour (tested: arrow keys move the sliders, the calendar and selector open) and a consistent look.
+**Not converted on purpose:** The chat composers, which are custom pill-shaped auto-growing inputs.
+**Cost:** More CSS and JS in the bundle. The country picker in the crisis banner is now a custom popup; it was tested to open correctly there.
+
 ---
 
 ## Open questions

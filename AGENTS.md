@@ -80,6 +80,13 @@ npm run lint
 - **A crisis message is never blocked by the guard.** Safety outranks injection defence.
 - Never pass raw upstream error text to the client: it contains the Groq org ID. Use `LlmError.publicMessage`.
 
+### Form controls: use Astryx, not native inputs
+- Sliders, date pickers, dropdowns and the check-in note use `@astryxdesign/core` (`Slider`, `DateInput`, `Selector`, `TextArea`). Import per component, e.g. `import { Slider } from "@astryxdesign/core/Slider"`. Don't add `<input type="range|date">` or `<select>`.
+- Setup (no build plugin needed): `app/providers.tsx` wraps the app in Astryx's `Theme` + `LinkProvider`; `app/globals.css` imports `astryx.css` and `theme-neutral/theme.css`, declares the layer order, then maps Astryx colour tokens to Bloom's palette in an unlayered `:root, [data-astryx-theme]` block. Change colours in Bloom's variables, not in Astryx's.
+- Every Astryx field needs a `label` (use `isLabelHidden` when we show our own heading). Don't wrap one in a `<label>`.
+- Full component docs are in `node_modules/@astryxdesign/core/dist/<Component>/*.d.ts` and the package README. `npx @astryxdesign/cli init` has **not** been run, so it hasn't edited this file.
+- The chat composers (Home and chat screens) stay as plain textareas on purpose: they auto-grow and are styled as one pill with the send button.
+
 ### Next.js / React
 - The LLM is called only from route handlers, never from client code. `lib/llm.ts` imports `server-only`. Message roles are stored as `user`/`model` in the browser and mapped to `user`/`assistant` in `app/api/chat/route.ts`.
 - Strict JSON schema mode (insight route) requires every property in `required` and `additionalProperties: false`.

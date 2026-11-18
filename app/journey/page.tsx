@@ -109,10 +109,10 @@ export default function JourneyPage() {
 
       <details className="rounded-3xl bg-card p-5 text-sm shadow-sm">
         <summary className="cursor-pointer font-bold">Settings</summary>
-        <label className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-4 flex items-center justify-between gap-3">
           Helplines for
-          <CountrySelect value={profile.country} onChange={(code) => setProfile((p) => ({ ...p, country: code }))} />
-        </label>
+          <CountrySelect value={profile.country} onChange={(code) => setProfile((p) => ({ ...p, country: code }))} width={200} />
+        </div>
         <div className="mt-4 flex gap-4 text-xs text-muted">
           <button onClick={() => seedDemo(now)} className="underline">
             Load demo data

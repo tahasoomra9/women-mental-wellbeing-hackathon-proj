@@ -1,11 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ISODateString } from "@astryxdesign/core/Calendar";
+import { DateInput } from "@astryxdesign/core/DateInput";
 import ChatWindow from "@/components/ChatWindow";
 import Icon, { type IconName } from "@/components/Icon";
 import { babyAgeWeeks, stamp, timeAgo, useNow } from "@/lib/client";
 import { DEFAULT_COUNTRY } from "@/lib/safety";
 import { DAY, useStore, type BabyEvent } from "@/lib/storage";
+
+/** Local-time YYYY-MM-DD (toISOString would shift the day for users behind UTC). */
+function toIsoDate(ts: number): ISODateString {
+  const d = new Date(ts);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` as ISODateString;
+}
 
 const NAPPY_COUNTRIES = ["GB", "IE", "AU", "IN", "PK"];
 
@@ -67,15 +76,17 @@ export default function BabyPage() {
           })}
         </div>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-          <label className="flex items-center gap-2">
-            Birthday
-            <input
-              type="date"
-              value={profile.babyBirth ?? ""}
-              onChange={(e) => setProfile((p) => ({ ...p, babyBirth: e.target.value || undefined }))}
-              className="min-h-9 rounded-lg border border-line bg-bg px-2 text-ink"
+          <div className="w-48">
+            <DateInput
+              label="Baby's birthday"
+              size="sm"
+              width="100%"
+              format="date"
+              value={profile.babyBirth as ISODateString | undefined}
+              max={now ? toIsoDate(now) : undefined}
+              onChange={(v) => setProfile((p) => ({ ...p, babyBirth: v || undefined }))}
             />
-          </label>
+          </div>
           {log.length > 0 && (
             <button onClick={() => setLog((prev) => prev.slice(0, -1))} className="min-h-9 px-2 font-semibold underline">
               Undo last

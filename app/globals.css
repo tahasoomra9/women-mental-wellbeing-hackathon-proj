@@ -1,4 +1,9 @@
+/* Layer order: Astryx component and theme styles sit below Tailwind components/utilities, so our classes can still override. */
+@layer reset, theme, base, astryx-base, astryx-theme, components, utilities;
+
 @import "tailwindcss";
+@import "@astryxdesign/core/astryx.css";
+@import "@astryxdesign/theme-neutral/theme.css";
 
 /*
   Bloom palette: calm lavender + warm peach, sage for "good things".
@@ -115,6 +120,13 @@ h2 {
   border-radius: 12px;
 }
 
+/* Astryx fields draw their own focus ring on the wrapper; skip ours so the ring isn't doubled. */
+input:focus-visible,
+textarea:focus-visible,
+[role="combobox"]:focus-visible {
+  outline: none;
+}
+
 input[type="range"] {
   accent-color: var(--primary);
 }
@@ -152,4 +164,30 @@ input[type="range"] {
   .animate-fade-up {
     animation: none;
   }
+}
+
+/*
+  Astryx tokens -> Bloom palette. Astryx sets its tokens on [data-astryx-theme] inside a cascade layer;
+  these unlayered rules win, and because they point at Bloom's own variables they follow light/dark mode too.
+*/
+:root,
+[data-astryx-theme] {
+  color-scheme: light dark;
+  --color-accent: var(--primary);
+  --color-on-accent: var(--primary-ink);
+  --color-accent-muted: var(--primary-soft);
+  --color-text-accent: var(--primary);
+  --color-icon-accent: var(--primary);
+  --color-text-primary: var(--ink);
+  --color-text-secondary: var(--muted);
+  --color-icon-primary: var(--ink);
+  --color-icon-secondary: var(--muted);
+  --color-background-body: var(--bg);
+  --color-background-surface: var(--card);
+  --color-background-card: var(--card);
+  --color-background-popover: var(--card);
+  --color-background-muted: var(--primary-soft);
+  --color-border: var(--line);
+  --color-border-emphasized: color-mix(in srgb, var(--primary) 40%, var(--line));
+  --font-family-body: var(--font-nunito), system-ui, sans-serif;
 }

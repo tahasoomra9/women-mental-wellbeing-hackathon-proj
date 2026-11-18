@@ -12,14 +12,14 @@ export function HotlineList({ showPicker = true }: { showPicker?: boolean }) {
   return (
     <div>
       {showPicker && (
-        <label className="mb-3 flex items-center gap-2 text-xs font-semibold text-muted">
+        <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-muted">
           Showing help for
           <CountrySelect
             value={country.code}
             onChange={(code) => setProfile((p) => ({ ...p, country: code }))}
-            className="py-1 text-xs"
+            size="sm"
           />
-        </label>
+        </div>
       )}
       <ul className="space-y-2">
         {getHotlines(country.code).map((h) => (

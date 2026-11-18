@@ -1,30 +1,30 @@
 "use client";
 
+import { Selector } from "@astryxdesign/core/Selector";
 import { COUNTRIES, DEFAULT_COUNTRY } from "@/lib/safety";
+
+const OPTIONS = COUNTRIES.map((c) => ({ value: c.code, label: c.name }));
 
 export default function CountrySelect({
   value,
   onChange,
-  className = "",
-  id,
+  size = "md",
+  width,
 }: {
   value?: string;
   onChange: (code: string) => void;
-  className?: string;
-  id?: string;
+  size?: "sm" | "md" | "lg";
+  width?: number | string;
 }) {
   return (
-    <select
-      id={id}
+    <Selector
+      label="Country"
+      isLabelHidden
+      options={OPTIONS}
       value={value ?? DEFAULT_COUNTRY}
-      onChange={(e) => onChange(e.target.value)}
-      className={`rounded-xl border border-line bg-bg px-3 py-2 text-ink outline-none focus:border-primary ${className}`}
-    >
-      {COUNTRIES.map((c) => (
-        <option key={c.code} value={c.code}>
-          {c.name}
-        </option>
-      ))}
-    </select>
+      onChange={onChange}
+      size={size}
+      width={width}
+    />
   );
 }

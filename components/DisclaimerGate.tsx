@@ -36,10 +36,12 @@ export default function DisclaimerGate() {
             placeholder="Your first name"
           />
         </label>
-        <label className="mt-3 block text-sm font-semibold">
+        <div className="mt-3 block text-sm font-semibold">
           Where are you? <span className="font-normal text-muted">(so we show the right helplines)</span>
-          <CountrySelect value={country} onChange={setCountry} className="mt-1 w-full font-normal" />
-        </label>
+          <div className="mt-1 font-normal">
+            <CountrySelect value={country} onChange={setCountry} width="100%" />
+          </div>
+        </div>
         <button
           onClick={() =>
             setProfile({ ...profile, name: name.trim() || undefined, country, acceptedDisclaimer: true })

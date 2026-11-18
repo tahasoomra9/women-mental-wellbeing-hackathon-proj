@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { Slider } from "@astryxdesign/core/Slider";
+import { TextArea } from "@astryxdesign/core/TextArea";
 import Icon from "@/components/Icon";
 import { useState } from "react";
 import { useStore } from "@/lib/storage";
@@ -85,27 +87,68 @@ export default function CheckinPage() {
         <p className="font-bold">
           Sleep in the last 24h: <span className="text-primary">{sleep}h</span>
         </p>
-        <input type="range" min={0} max={12} step={0.5} value={sleep} onChange={(e) => setSleep(+e.target.value)} className="mt-3 w-full" />
-        <p className="text-xs text-muted">Add up all the little bits; broken sleep counts.</p>
+        <div className="mt-3 px-1 pb-7">
+          <Slider
+            label="Hours of sleep in the last 24 hours"
+            isLabelHidden
+            value={sleep}
+            onChange={setSleep}
+            min={0}
+            max={12}
+            step={0.5}
+            width="100%"
+            valueDisplay="tooltip"
+            formatValue={(v) => `${v}h`}
+            marks={[
+              { value: 0, label: "0h" },
+              { value: 6, label: "6h" },
+              { value: 12, label: "12h" },
+            ]}
+          />
+        </div>
+        <p className="mt-2 text-xs text-muted">Add up all the little bits; broken sleep counts.</p>
       </div>
 
       <div className="rounded-3xl bg-card p-5 shadow-sm">
         <p className="font-bold">
           How supported do you feel? <span className="text-primary">{SUPPORT[support - 1]}</span>
         </p>
-        <input type="range" min={1} max={5} value={support} onChange={(e) => setSupport(+e.target.value)} className="mt-3 w-full" />
+        <div className="mt-3 px-1 pb-7">
+          <Slider
+            label="How supported you feel"
+            isLabelHidden
+            value={support}
+            onChange={setSupport}
+            min={1}
+            max={5}
+            step={1}
+            width="100%"
+            valueDisplay="none"
+            formatValue={(v) => SUPPORT[v - 1] ?? String(v)}
+            marks={[
+              { value: 1, label: "Alone" },
+              { value: 5, label: "Supported" },
+            ]}
+          />
+        </div>
       </div>
 
       <div className="rounded-3xl bg-card p-5 shadow-sm">
         <p className="font-bold">
           Anything on your mind? <span className="font-normal text-muted">(optional)</span>
         </p>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={2}
-          className="mt-2 w-full resize-none rounded-xl border border-line bg-bg px-3 py-2 outline-none focus:border-primary"
-        />
+        <div className="mt-2">
+          <TextArea
+            label="Anything on your mind?"
+            isLabelHidden
+            value={note}
+            onChange={setNote}
+            rows={2}
+            width="100%"
+            maxLength={500}
+            placeholder="Write as much or as little as you like"
+          />
+        </div>
       </div>
 
       <button
