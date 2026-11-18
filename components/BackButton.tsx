@@ -5,7 +5,7 @@ import Icon from "./Icon";
 
 // Secondary screens (opened from Home / Journey / chat links) get a Back button.
 // The four tab screens (Home, Talk, Baby, Journey) are reached from the bottom nav and don't need one.
-const SECONDARY = ["/breathe", "/checkin", "/screen"];
+const SECONDARY = ["/breathe", "/checkin", "/screen", "/sleep", "/weekly", "/about"];
 
 export default function BackButton() {
   const path = usePathname();

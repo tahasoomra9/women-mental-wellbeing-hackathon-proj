@@ -64,6 +64,9 @@ export function cleanContext(raw: unknown): UserContext {
         : undefined,
     babyAgeWeeks: num(c.babyAgeWeeks, 0, 520),
     // Allow-listed code only, so no free text reaches the prompt.
+    motherAge: num(c.motherAge, 12, 70),
+    feeding: (["breast", "formula", "mixed", "solids"] as const).find((f) => f === c.feeding),
+    firstBaby: typeof c.firstBaby === "boolean" ? c.firstBaby : undefined,
     country: COUNTRIES.some((x) => x.code === c.country) ? (c.country as string) : DEFAULT_COUNTRY,
   };
 }

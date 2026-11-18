@@ -6,13 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@astryxdesign/cli": "^0.7.16",
     "@astryxdesign/core": "^0.7.16",
     "@astryxdesign/theme-neutral": "^0.7.16",
     "@stylexjs/stylex": "^0.19.2",
+    "jspdf": "^4.2.1",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -20,13 +21,15 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@astryxdesign/cli": "^0.7.16",
     "@tailwindcss/turbopack": "4.3.3",
-    "@types/node": "^20",
+    "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "4.1.12"
   }
 }

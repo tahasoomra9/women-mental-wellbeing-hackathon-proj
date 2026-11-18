@@ -6,6 +6,7 @@ import Icon from "@/components/Icon";
 import Markdown from "@/components/Markdown";
 import MicButton, { type MicPhase } from "@/components/MicButton";
 import { buildContext, stamp } from "@/lib/client";
+import { addNotesFromInsight } from "@/lib/notes";
 import { CRISIS_TOKEN, detectCrisis } from "@/lib/safety";
 import { readStore, useStore, writeStore, type ChatMessage, type TalkStyle } from "@/lib/storage";
 
@@ -97,6 +98,7 @@ export default function ChatWindow({ mode, placeholder }: { mode: Mode; placehol
       if (res.ok) {
         const data = await res.json();
         setInsights((prev) => [...prev, { ts: stamp(), ...data }].slice(-50));
+        addNotesFromInsight(data, stamp()); // feeds the "For my doctor" summary
       }
     } catch {
       /* insights are a nice-to-have */

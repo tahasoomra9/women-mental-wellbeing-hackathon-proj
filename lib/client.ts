@@ -48,5 +48,8 @@ export function buildContext(epds: EpdsResult[], checkins: Checkin[], profile: P
       : undefined,
     babyAgeWeeks: babyAgeWeeks(profile, now),
     country: profile.country,
+    motherAge: profile.motherAge,
+    feeding: profile.feeding,
+    firstBaby: profile.firstBaby,
   };
 }

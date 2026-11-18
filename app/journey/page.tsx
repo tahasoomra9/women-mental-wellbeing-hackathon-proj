@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import CountrySelect from "@/components/CountrySelect";
-import Icon from "@/components/Icon";
+import Icon, { type IconName } from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
 import ScoreExplainer from "@/components/ScoreExplainer";
 import ScoreRing, { Sparkline } from "@/components/ScoreRing";
@@ -93,6 +93,7 @@ export default function JourneyPage() {
           title={checkedInToday ? "Checked in today" : "Daily check-in"}
           sub={checkedInToday ? "Update it any time" : "Mood, sleep & support · 30 seconds"}
         />
+        <RowLink href="/sleep" icon="moon" title="Sleep tracker" sub="Hours, longest stretch & wakings" />
         <RowLink
           href="/screen"
           icon="compass"
@@ -105,8 +106,16 @@ export default function JourneyPage() {
         />
       </div>
 
+      <div className="space-y-3">
+        <RowLink href="/weekly" icon="file" title="For my doctor" sub="A weekly summary you can save as a PDF" />
+        <RowLink href="/about" icon="user" title="About you and your baby" sub="Age, feeding & more · all optional" />
+      </div>
+
       <details className="rounded-3xl bg-card p-5 text-sm shadow-sm">
-        <summary className="flex min-h-11 cursor-pointer items-center font-bold">Settings</summary>
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between font-bold [&::-webkit-details-marker]:hidden">
+          Settings
+          <Icon name="chevron" className="h-4 w-4 text-muted" />
+        </summary>
         <div className="mt-4 flex items-center justify-between gap-3">
           Helplines for
           <CountrySelect value={profile.country} onChange={(code) => setProfile((p) => ({ ...p, country: code }))} width={200} />
@@ -129,7 +138,7 @@ export default function JourneyPage() {
   );
 }
 
-function RowLink({ href, icon, title, sub }: { href: string; icon: "heart" | "compass"; title: string; sub: string }) {
+function RowLink({ href, icon, title, sub }: { href: string; icon: IconName; title: string; sub: string }) {
   return (
     <Link href={href} className="flex items-center gap-4 rounded-3xl bg-card p-4 shadow-sm transition active:scale-[0.99]">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">

@@ -8,7 +8,7 @@ const TABS: { href: string; label: string; icon: IconName; match: string[] }[] =
   { href: "/", label: "Home", icon: "home", match: ["/", "/breathe"] },
   { href: "/talk", label: "Talk", icon: "chat", match: ["/talk"] },
   { href: "/baby", label: "Baby", icon: "baby", match: ["/baby"] },
-  { href: "/journey", label: "Journey", icon: "sprout", match: ["/journey", "/checkin", "/screen"] },
+  { href: "/journey", label: "Journey", icon: "sprout", match: ["/journey", "/checkin", "/screen", "/sleep", "/weekly", "/about"] },
 ];
 
 export default function BottomNav() {

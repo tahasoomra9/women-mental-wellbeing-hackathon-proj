@@ -6,6 +6,7 @@ import { TextArea } from "@astryxdesign/core/TextArea";
 import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
 import { useState } from "react";
+import { dateKey, entryFor, upsertSleep } from "@/lib/sleep";
 import { useStore } from "@/lib/storage";
 
 const MOODS = ["Really low", "Low", "Okay", "Good", "Great"];
@@ -26,6 +27,7 @@ const SUPPORT = ["Very alone", "Alone", "Some help", "Supported", "Very supporte
 
 export default function CheckinPage() {
   const [, setCheckins] = useStore("checkins", []);
+  const [, setSleepLog] = useStore("sleepLog", []);
   const [mood, setMood] = useState(3);
   const [sleep, setSleep] = useState(5);
   const [support, setSupport] = useState(3);
@@ -151,7 +153,9 @@ export default function CheckinPage() {
 
       <button
         onClick={() => {
-          setCheckins((prev) => [...prev, { ts: Date.now(), mood, sleep, support, note: note.trim() || undefined }]);
+          const ts = Date.now();
+          setCheckins((prev) => [...prev, { ts, mood, sleep, support, note: note.trim() || undefined }]);
+          setSleepLog((prev) => (entryFor(prev, dateKey(ts)) ? prev : upsertSleep(prev, dateKey(ts), { hours: sleep }, ts)));
           setSaved(true);
         }}
         className="w-full rounded-full bg-brand py-3 font-bold text-primary-ink"

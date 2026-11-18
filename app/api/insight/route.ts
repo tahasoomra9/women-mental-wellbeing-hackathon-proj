@@ -1,5 +1,6 @@
 import { complete } from "@/lib/llm";
 import { cleanText } from "@/lib/guard";
+import { detectCrisis } from "@/lib/safety";
 import { INSIGHT_PROMPT, insightInput } from "@/lib/prompts";
 
 // Strict JSON schema mode: every property required, no extra keys.
@@ -10,9 +11,33 @@ const schema = {
     moodScore: { type: "number", description: "0 (very distressed) to 10 (doing well)" },
     themes: { type: "array", items: { type: "string" }, description: "Up to 3 short themes" },
     suggestion: { type: "string" },
+    keyPoints: { type: "array", items: { type: "string" }, description: "Up to 4 doctor-useful facts, English" },
+    doctorQuestions: { type: "array", items: { type: "string" }, description: "Up to 3 questions for a clinician, English" },
   },
-  required: ["moodScore", "themes", "suggestion"],
+  required: ["moodScore", "themes", "suggestion", "keyPoints", "doctorQuestions"],
 };
+
+const HARM_NOTE = "Mentioned thoughts of self-harm or suicide (please ask about this directly)";
+const HARM_WORDS = /self.?harm|suicid|kill(ing)? (her|my)self|end(ing)? (her|my) life|hurt(ing)? (her|my)self|better off (dead|without)/i;
+
+/**
+ * Safety net: if she said something that suggests self-harm, the summary must say so, even if the model
+ * ran out of room or missed it. The note always goes first.
+ */
+function withHarmNote(points: string[], messages: { role: string; text: string }[]): string[] {
+  const said = messages.filter((m) => m.role === "user").some((m) => detectCrisis(String(m.text ?? "")));
+  if (!said || points.some((p) => HARM_WORDS.test(p))) return points;
+  return [HARM_NOTE, ...points].slice(0, 5);
+}
+
+/** Model output is untrusted text that ends up in a document she may hand to a doctor: trim, cap and drop junk. */
+function cleanList(value: unknown, max: number): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((v) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, 220))
+    .filter((v) => v.length > 3)
+    .slice(0, max);
+}
 
 export async function POST(request: Request) {
   let messages: { role: "user" | "model"; text: string }[];
@@ -36,7 +61,7 @@ export async function POST(request: Request) {
         { role: "system", content: INSIGHT_PROMPT },
         { role: "user", content: insightInput(transcript) },
       ],
-      { temperature: 0.2, jsonSchema: { name: "insight", schema } },
+      { temperature: 0.2, maxTokens: 1000, jsonSchema: { name: "insight", schema } },
     );
     const parsed = JSON.parse(text || "{}");
     const moodScore = Math.max(0, Math.min(10, Number(parsed.moodScore)));
@@ -45,6 +70,8 @@ export async function POST(request: Request) {
       moodScore,
       themes: Array.isArray(parsed.themes) ? parsed.themes.slice(0, 3).map(String) : [],
       suggestion: String(parsed.suggestion ?? ""),
+      keyPoints: withHarmNote(cleanList(parsed.keyPoints, 5), messages),
+      doctorQuestions: cleanList(parsed.doctorQuestions, 3),
     });
   } catch (err) {
     console.error("Insight error", err);

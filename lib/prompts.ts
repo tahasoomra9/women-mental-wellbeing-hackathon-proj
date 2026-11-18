@@ -7,6 +7,9 @@ export type UserContext = {
   babyAgeWeeks?: number;
   /** ISO country code from her profile (see COUNTRIES in lib/safety.ts). */
   country?: string;
+  motherAge?: number;
+  feeding?: "breast" | "formula" | "mixed" | "solids";
+  firstBaby?: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -168,8 +171,10 @@ Return:
 - moodScore: 0 (very distressed) to 10 (doing well), judged from her own messages
 - themes: up to 3 short themes (2–4 words each) about her wellbeing, e.g. "sleep deprivation", "guilt about feeding"
 - suggestion: one warm, specific, doable wellbeing suggestion for this week (max 25 words), addressed to her as "you"
+- keyPoints: up to 5 short, factual notes a doctor, midwife or health visitor would find useful, taken ONLY from what she actually said (symptoms, how long, triggers, sleep, appetite, mood, anxiety, bonding with baby, support at home, coping). Write them in plain neutral English as statements about her, e.g. "Reports crying most evenings for the past two weeks" or "Sleeping about 3 hours at a time". No diagnoses, no guesses, no advice. If she mentioned thoughts of harming herself, of suicide, or of harming her baby, the FIRST keyPoint MUST say so plainly (e.g. "Mentioned thoughts of self-harm"), whatever else there is to report. Use [] if there is nothing worth passing on.
+- doctorQuestions: up to 3 short questions she might want to ask a health professional, based on her concerns, in plain English (e.g. "Could my exhaustion be related to something other than lack of sleep?"). Use [] if none.
 
-If the conversation is off-topic or contains no emotional content, use moodScore 5, themes [], and a gentle general self-care suggestion. Write themes and suggestion in the language she mainly used. Do not diagnose.`;
+If the conversation is off-topic or contains no emotional content, use moodScore 5, themes [], and a gentle general self-care suggestion. Write themes and suggestion in the language she mainly used (keyPoints and doctorQuestions are always English, because they are for her clinician). Do not diagnose.`;
 
 export function insightInput(transcript: string): string {
   return `<transcript>\n${transcript.replaceAll("</transcript>", "")}\n</transcript>`;
@@ -188,6 +193,9 @@ function describeContext(ctx: UserContext): string {
       `- Latest check-in (${ctx.lastCheckin.daysAgo} days ago): mood ${ctx.lastCheckin.mood}/5, slept ${ctx.lastCheckin.sleep}h, feels supported ${ctx.lastCheckin.support}/5.`,
     );
   if (ctx.babyAgeWeeks !== undefined) lines.push(`- Baby is about ${ctx.babyAgeWeeks} weeks old.`);
+  if (ctx.motherAge !== undefined) lines.push(`- She is ${ctx.motherAge} years old.`);
+  if (ctx.firstBaby !== undefined) lines.push(ctx.firstBaby ? "- This is her first baby." : "- She has had a baby before.");
+  if (ctx.feeding) lines.push(`- Feeding: ${ctx.feeding === "solids" ? "baby is on solids as well as milk" : ctx.feeding + "-feeding"}.`);
   if (ctx.country && ctx.country !== "OTHER") {
     const c = getCountry(ctx.country);
     lines.push(

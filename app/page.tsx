@@ -189,10 +189,20 @@ export default function Home() {
           <p className="mt-2 font-bold leading-tight">Baby</p>
           <p className="mt-0.5 text-xs text-muted">{lastFeed ? `Last fed ${timeAgo(lastFeed.ts, now)}` : "Log feeds & ask anything"}</p>
         </Link>
+        <Link href="/sleep" className="rounded-3xl bg-card p-4 shadow-sm transition active:scale-[0.98]">
+          <Icon name="moon" className="h-5 w-5 text-primary" />
+          <p className="mt-2 font-bold leading-tight">Sleep</p>
+          <p className="mt-0.5 text-xs text-muted">Log last night</p>
+        </Link>
         <Link href="/checkin" className="rounded-3xl bg-card p-4 shadow-sm transition active:scale-[0.98]">
           <Icon name="heart" className="h-5 w-5 text-primary" />
           <p className="mt-2 font-bold leading-tight">Check in</p>
           <p className="mt-0.5 text-xs text-muted">30 seconds, just for you</p>
+        </Link>
+        <Link href="/weekly" className="rounded-3xl bg-card p-4 shadow-sm transition active:scale-[0.98]">
+          <Icon name="file" className="h-5 w-5 text-sage" />
+          <p className="mt-2 font-bold leading-tight">For my doctor</p>
+          <p className="mt-0.5 text-xs text-muted">Weekly summary (PDF)</p>
         </Link>
       </div>
 

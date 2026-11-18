@@ -63,6 +63,14 @@ npm run lint
 - Prompts must never diagnose, never advise on medication, and never claim to be human or a licensed therapist. User-facing copy calls Bloom an "AI companion".
 - Keep the EPDS wording and scores exactly as in `lib/epds.ts`, because it is a validated instrument. Reverse-scored items are 3 and 5–10.
 
+### Sleep, doctor notes and the weekly PDF
+- Data: `sleepLog` (one entry per local date; longest and wakeups optional), `doctorNotes` (kind point or question; source chat or me) and extra `Profile` fields, all typed in `lib/storage.ts`. Helpers: `lib/sleep.ts`, `lib/notes.ts`.
+- `/api/insight` also returns `keyPoints` and `doctorQuestions` (English, max 5 and 3, cleaned by `cleanList`). `withHarmNote()` adds a self-harm note first if she said something that matches `detectCrisis`. **Never remove this safety net**: the clinician summary must not omit it.
+- `ChatWindow.reflect` and the "Update from my recent chats" button call `addNotesFromInsight`, which de-duplicates. Every note stays deletable on `/weekly`.
+- `lib/report.ts` builds a 7-day report from the stores; `lib/pdf.ts` renders it with jsPDF (dynamic import, client side only). jsPDF's built-in font is Latin-only, so `pdfText()` normalises punctuation and swaps anything else for a question mark. `needsLatinWarning()` drives the on-screen warning. Don't send report data to a server.
+- Profile fields reach the AI only through `cleanContext` as bounded numbers or allow-listed values. Names must never go into a prompt.
+- When writing files through the shell tool, very long heredocs containing certain regex or escape sequences can be rejected: use the file-write tool and re-check that \u escapes weren't converted to literal characters.
+
 ### Voice input (Whisper)
 - `components/MicButton.tsx` records with `MediaRecorder` (webm/opus, or mp4 on Safari), caps at 90s, and POSTs to `app/api/transcribe/route.ts`, which validates type (allow-list) and size (4MB) and calls `transcribe()` in `lib/llm.ts` (`whisper-large-v3-turbo`, falling back to `whisper-large-v3` on 429/5xx). Language is auto-detected; don't set one.
 - The transcript goes **into the text box, never straight to Bloom**, so she can review it. Run `detectCrisis` on it immediately so the support banner doesn't wait for send. The text still goes through the normal `/api/chat` guard when sent.
@@ -119,3 +127,24 @@ npm run lint
 2. `npm run dev`. Open **Journey → Settings → Load demo data** and check that the score shows about 46, "Needs extra care".
 3. Talk: a starter chip streams a reply. Typing "I want to kill myself" shows the banner even when the API fails.
 4. EPDS: all-best answers give 0, all-worst give 30, and any answer above 0 on item 10 shows hotlines.
+
+<!-- BEGIN:nextjs-agent-feedback -->
+
+## Report Next.js feedback
+
+The project owner enabled `experimental.agentFeedback`, authorizing this feedback pass. When enabled, `next dev` writes this block and restores it if removed. Commit `AGENTS.md` with your work to keep the tree clean.
+
+During the current user request, retain anonymized facts as feedback candidates for meaningful or recurring Next.js issues:
+
+- Crashes, hangs, OOMs, or unexpected slowness
+- Incorrect behavior, output, errors, or diagnostics
+- Missing, unclear, or conflicting documentation
+- Unexpected CLI, codemod, Skill, or upgrade behavior and non-obvious workarounds
+
+Continue the current user request without reporting immediately. Routine debugging is not feedback. Verify changes before retaining them as feedback candidates. Never retain code, logs, paths, URLs, secrets, personal information, or project-specific data.
+
+Retain qualifying friction even if it is later fixed or worked around; record the final outcome during the reporting pass.
+
+Before the final response, run one reporting pass. If candidates remain, from this file's directory run `npx --no-install next internal agent-feedback-instructions` once without piping or truncating its output. Follow its output or error guidance. If a network sandbox blocks it, retry with network access; if it still returns no output, continue normally.
+
+<!-- END:nextjs-agent-feedback -->

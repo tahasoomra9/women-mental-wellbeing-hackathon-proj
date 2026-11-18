@@ -6,8 +6,31 @@ import type { EpdsResult } from "./epds";
 export type ChatMessage = { role: "user" | "model"; text: string; ts: number };
 export type Checkin = { ts: number; mood: number; sleep: number; support: number; note?: string };
 export type BabyEvent = { ts: number; kind: "feed" | "sleep" | "diaper" };
-export type Insight = { ts: number; moodScore: number; themes: string[]; suggestion: string };
-export type Profile = { name?: string; babyBirth?: string; acceptedDisclaimer?: boolean; country?: string };
+export type Insight = {
+  ts: number;
+  moodScore: number;
+  themes: string[];
+  suggestion: string;
+  /** Doctor-friendly facts Bloom picked out of the chat (English). Optional: older insights lack them. */
+  keyPoints?: string[];
+  doctorQuestions?: string[];
+};
+export type Feeding = "breast" | "formula" | "mixed" | "solids";
+export type Profile = {
+  name?: string;
+  babyBirth?: string;
+  acceptedDisclaimer?: boolean;
+  country?: string;
+  /** About her and the baby: all optional, used in the doctor summary and to tailor replies. */
+  motherAge?: number;
+  babyName?: string;
+  feeding?: Feeding;
+  firstBaby?: boolean;
+};
+/** One day of sleep. `date` is a local YYYY-MM-DD; longest/wakeups are optional (a check-in only knows the total). */
+export type SleepEntry = { date: string; hours: number; longest?: number; wakeups?: number; ts: number };
+/** Something worth telling the doctor: found by Bloom in a chat ("chat") or written by her ("me"). */
+export type DoctorNote = { id: string; ts: number; text: string; kind: "point" | "question"; source: "chat" | "me" };
 export type CrisisState = { active: boolean; ts: number };
 /** A message started elsewhere (e.g. Home) for a chat to send when it opens. */
 export type Pending = { mode: "therapist" | "baby"; text: string } | null;
@@ -21,6 +44,8 @@ export type Store = {
   checkins: Checkin[];
   babyLog: BabyEvent[];
   insights: Insight[];
+  sleepLog: SleepEntry[];
+  doctorNotes: DoctorNote[];
   profile: Profile;
   crisis: CrisisState;
   pending: Pending;

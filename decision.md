@@ -142,6 +142,18 @@ Each entry records the decision, why we made it, and what would make us revisit 
 **Limits:** 4MB and allow-listed audio types on the server (the app has no accounts, so this stops it being used as a free Whisper proxy for huge files, but not for repeated calls). Needs a browser that can record and a secure context.
 **Verified:** exact transcription of generated speech, upload validation, the full browser flow with a fake microphone, a spoken crisis phrase raising the banner, and the denied and no-microphone messages.
 
+### D25. Sleep tracker, profile details and the doctor summary
+**Decision:**
+- **Sleep tracker** (`/sleep`): per-day total, longest stretch and wakings, with a week chart and a calendar so she can back-fill any past day she forgot (tired mums miss days, so logging must never feel like a streak she has broken). Check-ins also write their sleep value here unless she already logged that day in detail.
+- **About you** (`/about`): optional age, names, feeding and first-baby. Only age, feeding and first-baby reach the AI, as bounded values.
+- **For my doctor** (`/weekly`): a weekly summary with an editable list of key points and questions, downloadable as a PDF. Key points are extracted by the insight call and stored as deletable `doctorNotes`.
+- The PDF is generated in the browser with jsPDF, so the data never leaves her phone.
+**Why:** The most useful thing Bloom can do for a mum with postnatal depression is help her get real care. Patterns (broken sleep, repeated worries) are hard to remember at an appointment, and a clear summary makes it easier to start the conversation. She stays in control: every item is visible, deletable and added to only by her choice or by Bloom's reading of what she said.
+**Safety:** a self-harm mention always appears first in the key points, added by the server if the model misses it. The EPDS item-10 flag appears in the PDF as "Please ask about this directly".
+**Language:** key points are English because the reader is a clinician. Her own typed notes can be any language, but jsPDF's standard font can only print Latin letters; other scripts show as "?" and she is warned. Embedding a Unicode font is a known follow-up.
+**Verified:** live extraction (including a self-harm statement plus an injection attempt, Roman Urdu input and an empty chat), the full UI flow in a browser, and a real downloaded PDF opened and read back.
+**Bug found on the way:** a lost backslash turned the whitespace clean-up regex into `/s+/`, deleting the letter "s" from key points. Caught by reading the real output, fixed, and noted here so output is always inspected, not just typechecked.
+
 ---
 
 ## Open questions
