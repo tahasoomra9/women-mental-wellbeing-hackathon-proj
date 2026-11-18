@@ -134,6 +134,14 @@ Each entry records the decision, why we made it, and what would make us revisit 
 **Verified:** no horizontal overflow at 320 or 390px (also 360 and 430 before the fixes) on any screen, and the screens were checked visually in light mode, plus the crisis banner and a desktop width.
 **Left alone:** Astryx's own inner pieces (the date field's text input and calendar icon, the slider thumb wrapper), whose enclosing controls are full-size. On desktop the app is a centred phone-width column on purpose.
 
+### D24. Voice input with Whisper
+**Decision:** A mic button on Home, Talk and Baby records up to 90 seconds, sends it to `/api/transcribe` (Groq `whisper-large-v3-turbo`, falling back to `whisper-large-v3`), and puts the text in the message box for her to check before sending. Language is auto-detected.
+**Why:** One-handed typing at 3am is hard, and talking is how many people vent naturally. Whisper handles many languages, which fits Bloom's reply-in-her-language rule. Reviewing before sending avoids sending a mis-heard message to the AI.
+**Safety:** The transcript is checked for crisis language straight away, so spoken distress shows support immediately. It still passes through the normal prompt-injection guard when sent.
+**Privacy:** Recordings are sent to Groq to be transcribed and are never stored by the app. The onboarding text says so. The mic is released immediately after recording.
+**Limits:** 4MB and allow-listed audio types on the server (the app has no accounts, so this stops it being used as a free Whisper proxy for huge files, but not for repeated calls). Needs a browser that can record and a secure context.
+**Verified:** exact transcription of generated speech, upload validation, the full browser flow with a fake microphone, a spoken crisis phrase raising the banner, and the denied and no-microphone messages.
+
 ---
 
 ## Open questions

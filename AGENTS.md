@@ -63,6 +63,12 @@ npm run lint
 - Prompts must never diagnose, never advise on medication, and never claim to be human or a licensed therapist. User-facing copy calls Bloom an "AI companion".
 - Keep the EPDS wording and scores exactly as in `lib/epds.ts`, because it is a validated instrument. Reverse-scored items are 3 and 5–10.
 
+### Voice input (Whisper)
+- `components/MicButton.tsx` records with `MediaRecorder` (webm/opus, or mp4 on Safari), caps at 90s, and POSTs to `app/api/transcribe/route.ts`, which validates type (allow-list) and size (4MB) and calls `transcribe()` in `lib/llm.ts` (`whisper-large-v3-turbo`, falling back to `whisper-large-v3` on 429/5xx). Language is auto-detected; don't set one.
+- The transcript goes **into the text box, never straight to Bloom**, so she can review it. Run `detectCrisis` on it immediately so the support banner doesn't wait for send. The text still goes through the normal `/api/chat` guard when sent.
+- Audio is never stored. The mic is released as soon as recording stops, and on unmount. Don't leave a stream open.
+- Recording state uses no red (it's reserved for crisis UI). Errors are kind, short and always offer typing as the alternative.
+
 ### Hotlines and language
 - Hotline numbers are safety-critical. Only add numbers you've verified from an official source, and note the hours if the line isn't 24/7. Every country list ends with findahelpline.com.
 - Bloom replies in her language and script (`LANGUAGE_RULES`, plus a final reminder at the end of each chat prompt, which the model needs). The `[[CRISIS]]` token always stays in English. The crisis regex is English-only, so for other languages the model's token is the only crisis signal.

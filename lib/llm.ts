@@ -106,3 +106,49 @@ export async function* streamCompletion(messages: LlmMessage[], opts: Options = 
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Speech to text (Whisper on Groq)
+// ---------------------------------------------------------------------------
+
+const WHISPER_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
+export const WHISPER_MODEL = process.env.GROQ_WHISPER_MODEL || "whisper-large-v3-turbo";
+// Slower but a separate rate limit; used when the turbo model is rate-limited.
+export const WHISPER_FALLBACK_MODEL = process.env.GROQ_WHISPER_FALLBACK_MODEL || "whisper-large-v3";
+
+/**
+ * Transcribe a short voice note. The language is auto-detected, so Urdu, Hindi, Arabic, Spanish and
+ * English all work. Returns trimmed text (empty string if nothing intelligible was heard).
+ */
+export async function transcribe(audio: Blob, filename: string): Promise<string> {
+  const key = apiKey();
+  const models = [WHISPER_MODEL, WHISPER_FALLBACK_MODEL].filter((m, i, a) => m && a.indexOf(m) === i);
+  let lastDetail = "";
+  for (const model of models) {
+    const form = new FormData();
+    form.append("file", audio, filename);
+    form.append("model", model);
+    form.append("response_format", "json");
+    form.append("temperature", "0");
+    const res = await fetch(WHISPER_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}` },
+      body: form,
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return String(data.text ?? "").trim();
+    }
+    const err = await res.json().catch(() => ({}));
+    lastDetail = `${model} ${res.status}: ${err?.error?.message ?? ""}`;
+    console.error("Whisper error", lastDetail);
+    if (res.status !== 429 && res.status < 500) break;
+  }
+  throw new LlmError(
+    lastDetail.includes(" 429:")
+      ? "Voice is busy right now. Please try again in a few seconds, or type instead."
+      : "Couldn't turn that into text. Please try again, or type instead.",
+    lastDetail,
+  );
+}

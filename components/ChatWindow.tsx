@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import BloomAvatar from "@/components/BloomAvatar";
 import Icon from "@/components/Icon";
 import Markdown from "@/components/Markdown";
+import MicButton, { type MicPhase } from "@/components/MicButton";
 import { buildContext, stamp } from "@/lib/client";
 import { CRISIS_TOKEN, detectCrisis } from "@/lib/safety";
 import { readStore, useStore, writeStore, type ChatMessage, type TalkStyle } from "@/lib/storage";
@@ -44,6 +45,7 @@ export default function ChatWindow({ mode, placeholder }: { mode: Mode; placehol
   const [streaming, setStreaming] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [voicePhase, setVoicePhase] = useState<MicPhase>("idle");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pendingHandled = useRef(false);
@@ -71,6 +73,14 @@ export default function ChatWindow({ mode, placeholder }: { mode: Mode; placehol
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]);
+
+  // Voice: the transcript goes into the box so she can read and edit it before sending.
+  const addVoiceText = (text: string) => {
+    if (detectCrisis(text)) flagCrisis(); // show support straight away, don't wait for send
+    setDraft((prev) => (prev.trim() ? `${prev.trimEnd()} ` : "") + text);
+    setError(null);
+    inputRef.current?.focus();
+  };
 
   const flagCrisis = () => {
     setCrisis({ active: true, ts: stamp() });
@@ -275,9 +285,10 @@ export default function ChatWindow({ mode, placeholder }: { mode: Mode; placehol
           rows={1}
           maxLength={2000}
           enterKeyHint="send"
-          placeholder={placeholder}
+          placeholder={voicePhase === "recording" ? "Listening…" : voicePhase === "transcribing" ? "" : placeholder}
           className="max-h-36 min-h-11 flex-1 resize-none bg-transparent py-2.5 leading-snug outline-none placeholder:text-muted/70"
         />
+        <MicButton onText={addVoiceText} onError={setError} onPhaseChange={setVoicePhase} disabled={streaming !== null} />
         <button
           type="submit"
           aria-label="Send"

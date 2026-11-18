@@ -24,7 +24,7 @@ export default function DisclaimerGate() {
         </p>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted">
           <li>It is <b>not</b> a doctor or licensed therapist and can&apos;t diagnose.</li>
-          <li>Your history is saved only on this device. Messages are sent to an AI service to generate replies.</li>
+          <li>Your history is saved only on this device. Messages, and voice recordings if you use the mic, are sent to an AI service to write replies and turn speech into text. Recordings are not saved.</li>
           <li>If you ever feel unsafe, call your local emergency number straight away.</li>
         </ul>
         <label className="mt-4 block text-sm font-semibold">

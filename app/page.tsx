@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BloomAvatar from "@/components/BloomAvatar";
+import MicButton, { type MicPhase } from "@/components/MicButton";
 import Icon from "@/components/Icon";
 import { timeAgo, useNow } from "@/lib/client";
 import { computeWellbeing } from "@/lib/score";
@@ -41,6 +42,8 @@ export default function Home() {
   const [babyLog] = useStore("babyLog", []);
   const [profile, , loaded] = useStore("profile", {});
   const [draft, setDraft] = useState("");
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [voicePhase, setVoicePhase] = useState<MicPhase>("idle");
   const now = useNow();
 
   function openTalk(text: string) {
@@ -108,8 +111,16 @@ export default function Home() {
               rows={2}
               maxLength={2000}
               enterKeyHint="send"
-              placeholder="Say anything. There are no right words."
+              placeholder={voicePhase === "recording" ? "Listening…" : voicePhase === "transcribing" ? "" : "Say anything. There are no right words."}
               className="min-h-12 flex-1 resize-none bg-transparent py-2 leading-snug outline-none placeholder:text-muted/70"
+            />
+            <MicButton
+              onText={(t) => {
+                setVoiceError(null);
+                setDraft((prev) => (prev.trim() ? `${prev.trimEnd()} ` : "") + t);
+              }}
+              onError={setVoiceError}
+              onPhaseChange={setVoicePhase}
             />
             <button
               type="submit"
@@ -121,6 +132,11 @@ export default function Home() {
             </button>
           </div>
         </form>
+        {voiceError && (
+          <p role="alert" className="mt-2 rounded-2xl bg-amber-soft px-4 py-2 text-sm">
+            {voiceError}
+          </p>
+        )}
         <p className="mt-4 text-xs font-bold text-muted">Or just tap what fits</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {FEELINGS.map((f) => (
