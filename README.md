@@ -1,4 +1,4 @@
-# Bloom 🌸 A gentle AI companion for new mums
+# Bloom: A gentle AI companion for new mums
 
 > Somewhere to vent, breathe and get support in the months after birth.
 
@@ -58,7 +58,7 @@ Bloom is designed around those barriers:
 
 ## Features
 
-### 🏠 Home: "How are you, really?"
+### Home: "How are you, really?"
 - A daily affirmation and a time-aware greeting (it acknowledges night-time: "Up in the night").
 - A big message box: say anything, and the message opens straight into a conversation with Bloom.
 - One-tap feelings: **Overwhelmed, Low, Anxious, Exhausted, Lonely, Okay actually**, with no typing required.
@@ -66,7 +66,7 @@ Bloom is designed around those barriers:
 - A gentle, non-alarming "You deserve care too" card when recent answers suggest she's struggling, with a button that helps her work out what to say to her GP or health visitor.
 - A tiny Journey teaser that celebrates effort ("You've checked in on yourself 6 days this week") and **never shows a score**.
 
-### 💬 Talk: the AI companion
+### Talk: the AI companion
 - **Two conversation styles**, switchable any time:
   - **Just listen** (default): Bloom reflects and validates, with no advice, tips or fixing, unless she asks.
   - **Help me through it**: after validating, Bloom gently offers perspective (CBT-style reframing of thoughts like "I'm a terrible mother") and **one** small next step.
@@ -78,36 +78,36 @@ Bloom is designed around those barriers:
 - **Start fresh** clears the conversation (a mood summary is saved first, so Journey keeps the thread).
 - Stays on topic: her wellbeing and her life as a mum. Off-topic requests (code, essays, role-play) get a kind redirect.
 
-### 🧾 EPDS screening
+### EPDS screening
 - The **Edinburgh Postnatal Depression Scale**, the 10-question tool midwives and doctors use worldwide, with standard wording and scoring (items 3 and 5–10 reverse-scored).
 - Results in three bands: **0–9** low risk, **10–12** some signs of low mood, **13+** signs of postnatal depression, each with plain-language advice.
 - **Item 10 (thoughts of self-harm) always triggers the crisis support flow**, whatever the total score.
 - Clear "this is a screening, not a diagnosis" wording.
 
-### 🌱 Journey (the optional score)
+### Journey (the optional score)
 - A **wellbeing score (0–100)** combining the EPDS (60%), recent daily check-ins (25%) and the mood Bloom picks up from conversations (15%). Missing parts are dropped and the rest reweighted.
 - Gentle labels (**Blooming, Steady, Tender days, Needs extra care**) in colours that are never red.
 - **"What's shaping this":** tap to see which factors are weighing on her or lifting her ("Sleep averaging 3.5h a day"), biggest first, each with a small, kind suggestion or a link to talk.
 - A 7-day trend, themes Bloom noticed in conversations, and "since yesterday" change.
 - A clinical override: an EPDS of 13+ (or any self-harm answer) always shows "Needs extra care", so a few good days can't hide a high-risk screen.
 
-### ❤️ Daily check-in
+### Daily check-in
 A 30-second check-in: **mood** (five drawn faces, with words), **sleep in the last 24 hours** (a custom slider; broken sleep counts), **how supported she feels**, and an optional note.
 
-### 👶 Baby care
+### Baby care
 - **One-tap log** for feeds, sleep and nappies, showing "last fed 2h 12m ago" and daily counts, with undo.
 - Baby's birthday (calendar picker) so answers are age-appropriate.
 - **Baby-care chat** with mainstream paediatric guidance (feeding, sleep, crying, nappies, development), including clear **red-flag warnings** (e.g. fever under 3 months, trouble breathing, dehydration).
 - **"Who is this about?" check:** if a message is ambiguous ("my man poops all day", "he hasn't slept in 2 days"), Bloom asks whether she means the baby before answering, and never gives advice for an adult.
 
-### 🌬️ "I need a minute": guided breathing
+### "I need a minute": guided breathing
 A one-minute paced breathing exercise (in 4s, hold 2s, out 6s, five rounds) with a calm animated circle. It works without any network or AI call, respects reduced-motion settings, and ends with "A bit calmer" or "Still tense, let's talk".
 
-### 🚨 Crisis support
+### Crisis support
 - A sticky, always-visible support banner with **helplines for her country** appears if she writes something that suggests she may be in danger (see [Safety](#safety-and-privacy)).
 - Country picker with **UK as the default**, plus the US, Ireland, Canada, Australia and India (Pakistan shows the national emergency line only), and "Other" with a pointer to findahelpline.com.
 
-### ✨ Other touches
+### Other touches
 - **Light and dark mode** that follow the phone setting (built for night feeds).
 - A **Back** button on secondary screens, and a quiet safety footer with her local emergency number.
 - Onboarding that asks only for an optional first name and her country.
