@@ -1,6 +1,7 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Markdown from "@/components/Markdown";
 import { buildContext, stamp } from "@/lib/client";
 import { CRISIS_TOKEN, detectCrisis } from "@/lib/safety";
 import { readStore, useStore, type ChatMessage } from "@/lib/storage";
@@ -144,7 +145,7 @@ export default function ChatWindow({ mode, placeholder }: { mode: Mode; placehol
         {streaming !== null && (streaming ? <Bubble role="model" text={streaming} /> : <Typing />)}
         {error && (
           <p className="rounded-2xl bg-alert-soft px-4 py-3 text-sm text-alert">
-            Couldn&apos;t reach Bloom: {error}
+            {error}
           </p>
         )}
         <div ref={bottomRef} />
@@ -177,6 +178,7 @@ export default function ChatWindow({ mode, placeholder }: { mode: Mode; placehol
             }
           }}
           rows={1}
+          maxLength={2000}
           placeholder={placeholder}
           className="max-h-32 flex-1 resize-none bg-transparent px-3 py-2 outline-none"
         />
@@ -201,7 +203,7 @@ function Bubble({ role, text }: { role: "user" | "model"; text: string }) {
           mine ? "rounded-br-md bg-rose text-rose-ink" : "rounded-bl-md bg-card shadow-sm"
         }`}
       >
-        <RichText text={text} />
+        {mine ? <p className="whitespace-pre-wrap">{text}</p> : <Markdown text={text} />}
       </div>
     </div>
   );
@@ -216,42 +218,5 @@ function Typing() {
         ))}
       </div>
     </div>
-  );
-}
-
-/** Minimal markdown: paragraphs, "- " / "* " / "1. " lists, **bold**. */
-function RichText({ text }: { text: string }) {
-  const blocks = text.split(/\n{2,}/);
-  return (
-    <>
-      {blocks.map((block, bi) => {
-        const lines = block.split("\n");
-        const isList = lines.every((l) => /^\s*([-*•]|\d+\.)\s+/.test(l));
-        if (isList)
-          return (
-            <ul key={bi} className="my-1 list-disc space-y-1 pl-5">
-              {lines.map((l, li) => (
-                <li key={li}>{inline(l.replace(/^\s*([-*•]|\d+\.)\s+/, ""))}</li>
-              ))}
-            </ul>
-          );
-        return (
-          <p key={bi} className={bi ? "mt-2" : ""}>
-            {lines.map((l, li) => (
-              <Fragment key={li}>
-                {li > 0 && <br />}
-                {inline(l)}
-              </Fragment>
-            ))}
-          </p>
-        );
-      })}
-    </>
-  );
-}
-
-function inline(s: string) {
-  return s.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith("**") && part.endsWith("**") ? <strong key={i}>{part.slice(2, -2)}</strong> : part.replace(/(^|\s)[*_](\S[^*_]*\S|\S)[*_](?=\s|$|[.,!?])/g, "$1$2"),
   );
 }

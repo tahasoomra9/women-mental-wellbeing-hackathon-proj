@@ -14,7 +14,7 @@ Bloom is an AI companion for mothers in the first year after birth. It offers th
 
 ## Stack
 - Next.js 16.4 App Router with Turbopack. `cacheComponents` is on (see `next.config.ts`). React 19.3, TypeScript, Tailwind v4.
-- Gemini via `@google/genai`. The key and model come from `.env.local` (`GEMINI_API_KEY`, optional `GEMINI_MODEL`, default `gemini-3.8-flash`).
+- Groq's OpenAI-compatible API, called with plain `fetch` (no SDK) in `lib/llm.ts`. The key and model come from `.env.local` (`GROQ_API_KEY`, optional `GROQ_MODEL`, default `openai/gpt-oss-120b`). gpt-oss is a reasoning model, so requests send `reasoning_effort: "low"` and `include_reasoning: false`.
 - No database and no auth. All user data is in the browser's localStorage.
 
 ## Commands
@@ -33,9 +33,10 @@ npm run lint
 | `app/screen/page.tsx` | EPDS 10-question flow and result |
 | `app/checkin/page.tsx` | Daily mood / sleep / support check-in |
 | `app/baby/page.tsx` | Feed/sleep/diaper quick log and baby-care chat |
-| `app/api/chat/route.ts` | POST, streams plain text from Gemini. Sets `X-Crisis: 1` on risky input |
+| `app/api/chat/route.ts` | POST, streams plain text from Groq. Sets `X-Crisis: 1` on risky input |
 | `app/api/insight/route.ts` | POST, structured JSON `{moodScore, themes, suggestion}` |
 | `components/ChatWindow.tsx` | Shared chat UI: streaming, crisis handling, auto-insight |
+| `components/Markdown.tsx` | Renders model replies with `react-markdown` + `remark-gfm` (tables). No raw HTML and no images. User messages are shown as plain text |
 | `components/CrisisBanner.tsx` | Sticky hotline banner. Also exports `HotlineList` |
 | `components/DisclaimerGate.tsx` | First-launch "not a therapist" modal |
 | `lib/storage.ts` | Typed localStorage store and `useStore` hook (same-tab sync via custom event) |
@@ -43,7 +44,8 @@ npm run lint
 | `lib/score.ts` | Wellbeing formula and 7-day history |
 | `lib/prompts.ts` | All system prompts (therapist, baby, insight) |
 | `lib/safety.ts` | Crisis regex, `CRISIS_TOKEN`, `HOTLINES` |
-| `lib/gemini.ts` | Server-only Gemini client |
+| `lib/llm.ts` | Server-only Groq client: `complete()` (supports `jsonSchema`) and `streamCompletion()`. Falls back to `gpt-oss-20b` on 429/5xx. Throws `LlmError`, whose `publicMessage` is the only error text sent to the browser |
+| `lib/guard.ts` | Prompt-injection classifier (`isInjection`, Llama Prompt Guard 2), `cleanText`, `cleanContext`, canned `GUARD_REPLY` |
 | `lib/client.ts` | `useNow`, `stamp`, `timeAgo`, `buildContext` |
 
 ## Rules
@@ -55,8 +57,22 @@ npm run lint
 - Prompts must never diagnose, never advise on medication, and never claim to be human or a licensed therapist. User-facing copy calls Bloom an "AI companion".
 - Keep the EPDS wording and scores exactly as in `lib/epds.ts`, because it is a validated instrument. Reverse-scored items are 3 and 5–10.
 
+### Scope and prompt injection (do not weaken)
+- **Topic limits:** the Talk chat discusses only *her* wellbeing. The Baby chat discusses only *her baby*. Anything else gets a one-line kind redirect (rules in `lib/prompts.ts`).
+- **Baby chat, "who is this about?":** an ambiguous subject ("my man", a bare "he", adult-sounding symptoms) gets one clarifying question and no advice yet. Never give health advice for a partner or another adult there.
+- **Layer 1, code (`lib/guard.ts` and the chat route):**
+  - only `user`/`model` roles are accepted from the client
+  - messages are capped at 2000 characters, and the last 20 are kept
+  - `[[CRISIS]]` is stripped from input
+  - the context is coerced to bounded numbers, so no free text from the client reaches the system prompt
+  - the last user message is screened by Prompt Guard (score ≥ 0.8 returns `GUARD_REPLY`, with header `X-Guard: 1`)
+- **Layer 2, prompts:** `INTEGRITY_RULES` appears in every chat prompt. The insight route wraps the transcript in `<transcript>` tags as data.
+- **A crisis message is never blocked by the guard.** Safety outranks injection defence.
+- Never pass raw upstream error text to the client: it contains the Groq org ID. Use `LlmError.publicMessage`.
+
 ### Next.js / React
-- Gemini is called only from route handlers, never from client code. `lib/gemini.ts` imports `server-only`.
+- The LLM is called only from route handlers, never from client code. `lib/llm.ts` imports `server-only`. Message roles are stored as `user`/`model` in the browser and mapped to `user`/`assistant` in `app/api/chat/route.ts`.
+- Strict JSON schema mode (insight route) requires every property in `required` and `additionalProperties: false`.
 - Pages that read localStorage are client components. Never read storage or call `Date.now()` during render: use `useStore` (its `loaded` flag) and `useNow()`, which returns `null` until mount. Inside event handlers, use `stamp()`. The react-hooks purity lint flags a bare `Date.now()` there.
 - New persisted data: add the key and its type to `Store` in `lib/storage.ts`, then use `useStore(key, fallback)`. Do not call `localStorage` directly.
 
